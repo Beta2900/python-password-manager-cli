@@ -1,0 +1,37 @@
+# Python Passwort Manager (CLI)
+
+## Beschreibung
+
+Dies ist ein einfacher konsolenbasierter Passwort-Manager, der mit Python entwickelt wurde.  
+Die Anwendung ermöglicht Benutzerverwaltung mit Rollen (Admin/User), sichere Passwortspeicherung mittels Hashing sowie eine lokale Speicherung über SQLite.
+
+Das Projekt wurde zu Lernzwecken erstellt, um Grundlagen in Datenbanken, Authentifizierung und strukturiertem Python-Code zu üben.
+
+---
+## Nutzung
+
+Das Python Script in einer IDE (zb VSC) öffnen und in einem dedizierten Terminal ausführen
+Zu beginn wird der Nutzer : "admin" , Pw : "admin123" initialisiert.
+Daraufhin öffnet sich im Terminal ein Menü in dem man gewisse Optionen auswählen kann.
+Nachdem man sich mit dem Nutzer "admin" anmeldet kann man auf die vollen Funktionen zugreifen.
+
+## Funktionen
+
+- Benutzer-Login-System
+- Rollenbasiertes Zugriffssystem (Admin / User)
+- Benutzer erstellen (nur Admin)
+- Benutzer auflisten (nur Admin)
+- Benutzer löschen (nur Admin)
+- Passwort-Hashing mit bcrypt
+- Speicherung in SQLite-Datenbank
+- Konsolenbasierte Benutzeroberfläche
+
+---
+
+## Verwendete Technologien
+
+- Python 3
+- SQLite3
+- bcrypt
+
+---
