@@ -9,21 +9,23 @@ cursor.execute("""
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE,
-    password_hash BLOB,
+    password_hash BLOB,    
     rolle TEXT
 )
 """)
+#BLOP = Bytes statt Text -> kein encoding , exakte speicherung der Bytes
+
 #Erstellung eines "Starter-Admin" Benutzers weil die Datenbank anfangs leer ist.
-cursor.execute("SELECT * FROM users WHERE username = ?", ("admin",))
-if cursor.fetchone() is None:
-    password = "admin123"
-    hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()) #Passwort wird gehasht, damit es nicht im Klartext in der Datenbank gespeichert wird. bcrypt ist eine sichere Hashing-Funktion, die speziell für Passwörter entwickelt wurde.
+cursor.execute("SELECT * FROM users WHERE username = ?", ("admin",))  #Gibt es den Admin schon ?
+if cursor.fetchone() is None: # wenn nicht
+    password = "admin123" 
+    hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()) #Passwort wird zu erst von String zu Bytes und dann Verhashung. Am ende gensalt() wegen Rainbowattacken (Also wenn 2 Nutzer dasselbe PW haben kommen unterschiedliche Hashes raus)
 
     cursor.execute("""
-        INSERT INTO users (username, password_hash, rolle)
+        INSERT INTO users (username, password_hash, rolle) 
         VALUES (?, ?, ?)
-    """, ("admin", sqlite3.Binary(hashed), "admin"))
-
+    """, ("admin", sqlite3.Binary(hashed), "admin"))  # Values 
+# Neue Zeile in die Tabelle "users" einfügen , ? - Platzhalter -> Trennung von Code und Daten + Schutz vor SQL Injections
     conn.commit()
     print("Default Admin erstellt: admin / admin123")
 
@@ -37,21 +39,21 @@ conn.commit()
 def create_user(): 
     username = input("Nutzername eingeben: ")
     hashed_password = input("Passwort eingeben: ")
-    rolle = input("Rolle eingeben (admin/user): ").lower()
+    rolle = input("Rolle eingeben (admin/user): ").lower() # .lower() damit aus "ADMIN" -> "admin" wird oder ähnlichem.
 
-    if rolle not in ["admin", "user"]:
-        print("Ungültige Rolle! Bitte 'admin' oder 'user' eingeben.")
+    if rolle not in ["admin", "user"]: # Damit NUR user oder admins möglich sind und wenn man etwas anderes eingibt werden daraus immer user
+        print("Ungültige Rolle! Bitte 'admin' oder 'user' eingeben.") 
         rolle = "user"
     
-    cursor.execute("SELECT * FROM users WHERE username = ?",(username,))
+    cursor.execute("SELECT * FROM users WHERE username = ?",(username,)) #Gibt es den User schon 
     if cursor.fetchone():
         print("User existiert bereits!")
         input("Drücke Enter zum Fortfahren...")
         return
     
-    hashed_password = bcrypt.hashpw(hashed_password.encode('utf-8'), bcrypt.gensalt())
+    hashed_password = bcrypt.hashpw(hashed_password.encode('utf-8'), bcrypt.gensalt()) #Hashing..
 
-    cursor.execute("INSERT INTO users (username, password_hash, rolle) VALUES (?, ?, ?)",(username, sqlite3.Binary(hashed_password), rolle))
+    cursor.execute("INSERT INTO users (username, password_hash, rolle) VALUES (?, ?, ?)",(username, sqlite3.Binary(hashed_password), rolle)) #Abspeichern der Daten in DB
     conn.commit()
     print("User erstellt!")
     input("Drücke Enter zum Fortfahren...")
@@ -82,18 +84,18 @@ def login():
     username = input("Nutzername eingeben: ")
     password = input("Passwort eingeben: ")
     cursor.execute("SELECT password_hash,rolle FROM users WHERE username = ?", (username,)) # Gibt es diesen Nutzer überhaupt? Wenn ja, wird der Passwort-Hash und die Rolle zurückgegeben.
-    row = cursor.fetchone()
+    row = cursor.fetchone() 
 
     if row is None:
         print("Anmeldung fehlgeschlagen!")
         input("Drücke Enter zum Fortfahren...")
         return None
     
-    stored_password_hash = row[0]
+    stored_password_hash = row[0] #Werte aus der DB holen
     rolle = row[1]
 
     if isinstance(stored_password_hash, memoryview):
-        stored_password_hash = stored_password_hash.tobytes()
+        stored_password_hash = stored_password_hash.tobytes() #SQL Lite speichert BLOPs manchmal als memoryview statt bytes -> bcrpyt braucht aber bytes
 
     if bcrypt.checkpw(password.encode('utf-8'), stored_password_hash):
         print("Login erfolgreich!")
@@ -105,8 +107,9 @@ def login():
         return None
 
 
-def clearscreen():    
-    print("\033[H\033[J", end="")
+def clearscreen():  # Kein echtes Löschen sondern verschieben für Sauberkeit
+    for i in range(20):
+        print()
 
 def menu(current_user):
     print("---------------Passwort Manager---------------")
