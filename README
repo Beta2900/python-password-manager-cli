@@ -33,5 +33,5 @@ Nachdem man sich mit dem Nutzer "admin" anmeldet kann man auf die vollen Funktio
 - Python 3
 - SQLite3
 - bcrypt
-
+- Sämtliche Methoden bezüglich Sqlite3 und bcrypt wurden mit hilfe von Ai recheriert 
 ---
